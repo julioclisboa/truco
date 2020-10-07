@@ -1,3 +1,11 @@
 .carta{
     background-repeat: no-repeat;
 }
+
+.fundo-mesa{
+    background-image: url("/assets/cartas/FUNDO.png");
+}
+
+.placar{
+    background-color: aquamarine;
+}

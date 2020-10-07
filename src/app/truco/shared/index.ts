@@ -1,2 +1,5 @@
 export * from './truco.service';
-export * from './Carta';
+export * from './carta-model';
+export * from './jogador-model';
+export * from './rodada-model';
+

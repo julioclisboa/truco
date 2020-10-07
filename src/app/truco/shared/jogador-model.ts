@@ -1,0 +1,6 @@
+export class Jogador{
+
+    constructor(){
+        
+    }
+}

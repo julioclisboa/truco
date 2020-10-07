@@ -50,8 +50,9 @@ export class TrucoComponent implements OnInit {
     this.configuraJogada(cartaSelecionada);
   }
 
+  /*
   continua() {
-    this.trucoService.verificaGanhador(this.carta1, this.carta2);
+    //this.trucoService.verificaGanhador(this.carta1, this.carta2);
     if (this.trucoService.empate) {
       this.pcPontos += 1;
     } else {
@@ -62,6 +63,7 @@ export class TrucoComponent implements OnInit {
 
     this.zeraRodada();
   }
+  */
 
   //----------------------------------------------
   selecionaPC(posicao: number) {
@@ -69,6 +71,31 @@ export class TrucoComponent implements OnInit {
     this.cartasComputador = this.cartasComputador.filter((carta) => carta.idCarta != cartaSelecionada.idCarta);
 
     this.configuraJogada(cartaSelecionada);
+  }
+
+  continua(){
+    let aleatorio = Math.floor(Math.random() * this.cartasComputador.length);
+    this.selecionaCarta(aleatorio,false);
+  }
+
+  selecionaCarta(posicao: number, euJogando: boolean) {
+
+    if((euJogando && this.trucoService.minhaVez) || (!euJogando && !this.trucoService.minhaVez) ) {
+      this.trucoService.selecionaCarta(posicao);
+      this.carta1 = this.trucoService.minhaCarta;
+      this.carta2 = this.trucoService.cartaAdversario;
+      this.carta1Img = (this.carta1) ? this.carta1.urlFoto : '';
+      this.carta2Img = (this.carta2) ? this.carta2.urlFoto : '';
+
+      this.minhasCartas = this.trucoService.minhasCartas;
+      this.cartasComputador = this.trucoService.cartasComputador;
+
+      this.meusPontos = this.trucoService.meusPontos;
+      this.pcPontos = this.trucoService.pontosComputador;
+      this.tentosValendo = this.trucoService.tentosValendo;
+    } else {
+      alert("Não é sua vez!");
+    }
   }
 
   //----------------------------------------------
@@ -84,9 +111,7 @@ export class TrucoComponent implements OnInit {
       }
     }
 
-    console.log("Recebido a carta", carta);
-    console.log("Carta 1", this.carta1);
-    console.log("Carta 2", this.carta2);
+    //this.trucoService.verificaGanhador(this.carta1, this.carta2);
   }
 
   zeraRodada() {

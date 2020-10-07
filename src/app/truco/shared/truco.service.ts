@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { Carta } from './Carta';
+import { Carta } from '../shared/carta-model';
+import { Rodada } from '../shared/rodada-model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,24 +17,19 @@ export class TrucoService {
   minhasCartas: Carta[];
   cartasComputador: Carta[];
 
-  carta1Img: string = '';
-  carta2Img: string = '';
-  carta1: Carta;
-  carta2: Carta;
-
-  carta1Vence: boolean;
-  carta2Vence: boolean;
   empate: boolean;
+  minhaVez: boolean = true;
 
+  minhaCarta: Carta;
+  cartaAdversario: Carta;
+
+  rodadasTruco: Rodada[];
   rodada: number = 1;
-  rodada1: boolean;
-  rodada2: boolean;
-  rodada3: boolean;
+  rodadaFinal: boolean;
 
   private cartas: Carta[] = [];
   private sequencia: any[];
   private baralhoLimpo: boolean;
-  private quantCartas: number;
 
   meusPontos: number = 0;
   pontosComputador: number = 0;
@@ -42,29 +38,29 @@ export class TrucoService {
   constructor() { }
 
   iniciaJogo(limpo: boolean): void {
+
+    console.log("INICIA JOGO");
+
     this.cartas = [];
     this.minhasCartas = [];
     this.cartasComputador = [];
+    this.rodadasTruco = [];
     this.baralhoLimpo = limpo;
     this.sequencia = (limpo) ? this.sequenciaLimpo : this.sequenciaSujo;
     this.cartaManilha = '';
-    this.carta1Vence = false;
-    this.carta2Vence = false;
     this.empate = false;
-    this.rodada1 = false;
-    this.rodada2 = false;
-    this.rodada3 = false;
+    this.rodadaFinal = false;
     this.montaCartas();
     this.sorteiaIDManilha();
 
     this.geraMinhasCartas();
     this.geraCartasPC();
 
-    //console.log("Cartas",this.cartas);
+    //console.log("Cartas", this.cartas);
   }
 
+  //----------------------------------------------
   montaCartas() {
-    this.quantCartas = (this.baralhoLimpo) ? this.nipes.length * 6 : this.nipes.length * 10;
     let sequencial = 0;
 
     for (let i = 0; i < this.sequencia.length; i++) {
@@ -77,6 +73,12 @@ export class TrucoService {
     }
   }
 
+  //----------------------------------------------
+  mudaAVez() {
+    this.minhaVez = !this.minhaVez;
+  }
+
+  //----------------------------------------------
   marcaComoManilha() {
     let sequencial = 0;
     for (let i = 0; i < this.sequencia.length; i++) {
@@ -94,12 +96,14 @@ export class TrucoService {
     })
   }
 
+  //----------------------------------------------
   sorteiaIDManilha(): void {
     this.cartaVira = this.geraCartaAleatoria();
     this.marcaComoUsada(this.cartaVira.idCarta);
     this.marcaComoManilha();
   }
 
+  //----------------------------------------------
   geraIDNaoUsado(): number {
     let id = 0;
     let continua = true;
@@ -111,14 +115,14 @@ export class TrucoService {
         continua = false;
       }
     }
-
     return id;
   }
 
+  //----------------------------------------------
   marcaComoUsada(id: number) {
     this.cartas.map((carta, posicao) => {
       if (carta.idCarta == id) {
-        this.cartas[posicao].emUso = true;
+        this.cartas[posicao].isUsed();
       }
     })
   }
@@ -127,7 +131,7 @@ export class TrucoService {
   marcaManilha(id: number) {
     this.cartas.map((carta, posicao) => {
       if (carta.idCarta == id) {
-        this.cartas[posicao].manilha = true;
+        this.cartas[posicao].isManilha();
       }
     })
   }
@@ -141,6 +145,7 @@ export class TrucoService {
     })
   }
 
+  //----------------------------------------------
   geraMinhasCartas(): void {
     for (let i = 0; i < 3; i++) {
       let minhacarta = this.geraCartaAleatoria();
@@ -148,13 +153,16 @@ export class TrucoService {
     }
   }
 
+  //----------------------------------------------
   geraCartasPC(): void {
     for (let i = 0; i < 3; i++) {
       let minhacarta = this.geraCartaAleatoria();
+      minhacarta.viraAoContrario();
       this.cartasComputador.push(minhacarta);
     }
   }
 
+  //----------------------------------------------
   geraCartaAleatoria(): Carta {
     let id = this.geraIDNaoUsado();
     let carta = this.cartas.find((carta) => carta.idCarta == id);
@@ -162,30 +170,111 @@ export class TrucoService {
     return carta;
   }
 
-  verificaGanhador(carta1: Carta, carta2: Carta): void {
+  //-----------------------------------------------------------
+  selecionaCarta(posicao: number) {
+    let cartaSelecionada;
+    let rodada: Rodada;
 
-    let temVencedor = false;
+    if (this.minhaVez) {
+      //console.log("USUARIO joga");
+      cartaSelecionada = this.minhasCartas[posicao];
+      this.minhasCartas = this.minhasCartas.filter((carta) => carta.idCarta != cartaSelecionada.idCarta);
+      this.minhaCarta = cartaSelecionada;
+    } else {
+      //console.log("COMPUTADOR joga");
+      cartaSelecionada = this.cartasComputador[posicao];
+      this.cartasComputador = this.cartasComputador.filter((carta) => carta.idCarta != cartaSelecionada.idCarta);
+      this.cartaAdversario = cartaSelecionada;
+      this.cartaAdversario.desviraCarta();
+    }
 
-    if (carta1 && carta2) {
-      if (carta1.valor > carta2.valor) {
-        console.log("Carta 1 Ganhou!");
-        this.carta1Vence = true;
-        this.carta2Vence = false;
-        this.empate = false;
-        temVencedor = true;
-      } else if (carta1.valor == carta2.valor) {
-        console.log("Empate");
-        this.carta1Vence = false;
-        this.carta2Vence = false;
-        this.empate = true;
+    console.log("Carta Jogada", cartaSelecionada);
+
+    if (this.minhaCarta && this.cartaAdversario) {
+      this.rodada++;
+      rodada = new Rodada(this.rodada, this.minhaCarta, this.cartaAdversario);
+      if (rodada.verificaVencedor()) {
+        console.log("Eu venci?", rodada.primeiraVence);
+        if (rodada.empate) {
+          this.mudaAVez();
+        } else {
+          this.minhaVez = rodada.primeiraVence;
+        }
+        this.limpaARodada(rodada);
       } else {
-        console.log("Carta 2 Ganhou!");
-        this.carta1Vence = false;
-        this.carta2Vence = true;
-        this.empate = false;
-        temVencedor = true;
+        console.log("Sem vencedor");
+      }
+
+      console.log("Rodadas", this.rodadasTruco);
+      this.validaAsRodadas();
+
+    } else {
+      this.mudaAVez();
+    }
+  }
+
+  //-----------------------------------------------------------
+  limpaARodada(rodada?: Rodada) {
+    this.minhaCarta = null;
+    this.cartaAdversario = null;
+    if (rodada) {
+      this.rodadasTruco.push(rodada);
+    }
+  }
+
+  //-----------------------------------------------------------
+  validaAsRodadas(): void {
+    let qtdVitoriasEu = 0;
+    let qtdVitoriasPC = 0;
+    let minhaVitoria: boolean = false;
+    let minhaDerrota: boolean = false;
+    let teveEmpate: boolean = false;
+
+    if (this.rodadasTruco.length > 1) {
+      console.log("Inicio validação da rodada");
+
+      teveEmpate = this.rodadasTruco.filter((rodada) => rodada.empate).length > 0;
+      qtdVitoriasEu = this.rodadasTruco.filter((rodada) => rodada.primeiraVence).length;
+      qtdVitoriasPC = this.rodadasTruco.filter((rodada) => rodada.segundaVence).length;
+
+      console.log("Venci", qtdVitoriasEu);
+      console.log("Perdi", qtdVitoriasPC);
+
+      if (teveEmpate) {
+        console.log("Teve empate");
+        if (this.rodadasTruco.length == 3) {
+          minhaVitoria = qtdVitoriasEu == 2 || this.rodadasTruco[0].primeiraVence;
+          minhaDerrota = !minhaVitoria;
+        } else {
+          minhaVitoria = this.rodadasTruco[1].primeiraVence;
+          minhaDerrota = !minhaVitoria;
+        }
+
+        console.log("Minha Vitoria?", minhaVitoria);
+      } else {
+        if (qtdVitoriasEu == 2 || qtdVitoriasPC == 2) {
+          minhaVitoria = qtdVitoriasEu == 2;
+          minhaDerrota = !minhaVitoria;
+          console.log("Minha Vitoria?", minhaVitoria);
+        }
+      }
+
+      if (minhaVitoria || minhaDerrota) {
+        this.somaPontos(minhaVitoria);
+        this.rodadasTruco = [];
+        this.mudaAVez();
       }
     }
+  }
+
+  somaPontos(venci: boolean) {
+    if (venci) {
+      this.meusPontos += this.tentosValendo;
+    } else {
+      this.pontosComputador += this.tentosValendo
+    }
+    this.tentosValendo = 1;
+    this.limpaARodada();
   }
 
 }
