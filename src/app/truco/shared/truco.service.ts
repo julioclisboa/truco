@@ -12,25 +12,24 @@ export class TrucoService {
   private readonly sequenciaLimpo = ["Q", "J", "K", "A", "2", "3"];
   private readonly sequenciaSujo = ["4", "5", "6", "7", "Q", "J", "K", "A", "2", "3"];
 
+  private cartas: Carta[] = [];
+  private sequencia: any[];
+
   cartaVira: Carta;
-  cartaManilha: string;
   minhasCartas: Carta[];
   cartasComputador: Carta[];
-
-  empate: boolean;
-  minhaVez: boolean = true;
-
   minhaCarta: Carta;
   cartaAdversario: Carta;
 
   rodadasTruco: Rodada[];
+
+  empate: boolean;
+  minhaVez: boolean = true;
+  finalDaRodada: boolean;
+
+  cartaManilha: string;
+
   rodada: number = 1;
-  rodadaFinal: boolean;
-
-  private cartas: Carta[] = [];
-  private sequencia: any[];
-  private baralhoLimpo: boolean;
-
   meusPontos: number = 0;
   pontosComputador: number = 0;
   tentosValendo: number = 1;
@@ -45,17 +44,15 @@ export class TrucoService {
     this.minhasCartas = [];
     this.cartasComputador = [];
     this.rodadasTruco = [];
-    this.baralhoLimpo = limpo;
     this.sequencia = (limpo) ? this.sequenciaLimpo : this.sequenciaSujo;
     this.cartaManilha = '';
     this.empate = false;
-    this.rodadaFinal = false;
+    this.finalDaRodada = false;
     this.montaCartas();
     this.sorteiaIDManilha();
 
     this.geraMinhasCartas();
     this.geraCartasPC();
-
     //console.log("Cartas", this.cartas);
   }
 
@@ -101,7 +98,7 @@ export class TrucoService {
     this.cartaVira = this.geraCartaAleatoria();
     this.marcaComoUsada(this.cartaVira.idCarta);
     this.marcaComoManilha();
-    console.log(`Vira é a carta ${this.cartaVira.carta} de ${this.cartaVira.nipe}`);
+    console.log(`Vira é a carta ${this.cartaVira.carta} de ${NipesBaralho[this.cartaVira.nipe]}`);
   }
 
   //----------------------------------------------
@@ -191,10 +188,9 @@ export class TrucoService {
 
     //console.log("Carta Jogada", cartaSelecionada);
     if (this.minhaVez) {
-      console.log(`MINHA Carta Jogada ${cartaSelecionada.carta} de ${cartaSelecionada.nipe}`);
+      console.log(`MINHA Carta: ${cartaSelecionada.carta} de ${NipesBaralho[cartaSelecionada.nipe]}`);
     } else {
-      console.log(`PC Carta Jogada ${cartaSelecionada.carta} de ${cartaSelecionada.nipe}`);
-
+      console.log(`PC Carta: ${cartaSelecionada.carta} de ${NipesBaralho[cartaSelecionada.nipe]}`);
     }
 
     if (this.minhaCarta && this.cartaAdversario) {
@@ -207,24 +203,21 @@ export class TrucoService {
         } else {
           this.minhaVez = rodada.primeiraVence;
         }
-        this.limpaARodada(rodada);
+        this.rodadasTruco.push(rodada);
+        //this.limpaARodada();
       } else {
         console.log("Sem vencedor");
       }
-      this.validaAsRodadas();
-
     } else {
       this.mudaAVez();
     }
   }
 
   //-----------------------------------------------------------
-  limpaARodada(rodada?: Rodada) {
+  limpaARodada() {
     this.minhaCarta = null;
     this.cartaAdversario = null;
-    if (rodada) {
-      this.rodadasTruco.push(rodada);
-    }
+    this.validaAsRodadas();
   }
 
   //-----------------------------------------------------------
@@ -254,7 +247,6 @@ export class TrucoService {
           minhaVitoria = this.rodadasTruco[1].primeiraVence;
           minhaDerrota = !minhaVitoria;
         }
-
         console.log("Minha Vitoria?", minhaVitoria);
       } else {
         if (qtdVitoriasEu == 2 || qtdVitoriasPC == 2) {
@@ -266,8 +258,10 @@ export class TrucoService {
 
       if (minhaVitoria || minhaDerrota) {
         console.log("FINAL DA RODADA");
+        this.finalDaRodada = true;
         this.somaPontos(minhaVitoria);
         this.mudaAVez();
+        this.iniciaJogo(true);
       }
     }
   }
@@ -279,7 +273,13 @@ export class TrucoService {
       this.pontosComputador += this.tentosValendo
     }
     this.tentosValendo = 1;
-    this.iniciaJogo(true);
   }
 
+}
+
+enum NipesBaralho {
+  O = "Ouros",
+  E = "Espada",
+  C = "Copas",
+  P = "Paus"
 }

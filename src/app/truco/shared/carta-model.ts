@@ -39,4 +39,5 @@ export class Carta {
         this.virada = false;
         this.urlFoto = `/assets/cartas/${this.imagem}.png`;
     }
+    
 }
