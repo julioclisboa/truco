@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { NgForm } from '@angular/forms';
 
-import { Carta, TrucoService } from '../shared';
+import { Carta, TrucoService, Rodada } from '../shared';
 
 @Component({
   selector: 'app-truco',
@@ -26,6 +26,11 @@ export class TrucoComponent implements OnInit {
   pcPontos: number = 0;
   tentosValendo: number = 1;
 
+  primeiraRodada: string = '';
+  segundaRodada: string = '';
+  terceiraRodada: string = '';
+  rodadasJogo: Rodada[];
+
   constructor(
     private trucoService: TrucoService
   ) { }
@@ -42,45 +47,14 @@ export class TrucoComponent implements OnInit {
     this.cartasComputador = this.trucoService.cartasComputador;
   }
 
-  //----------------------------------------------
-  selecionaEu(posicao: number) {
-    let cartaSelecionada = this.minhasCartas[posicao];
-    this.minhasCartas = this.minhasCartas.filter((carta) => carta.idCarta != cartaSelecionada.idCarta);
-
-    this.configuraJogada(cartaSelecionada);
-  }
-
-  /*
   continua() {
-    //this.trucoService.verificaGanhador(this.carta1, this.carta2);
-    if (this.trucoService.empate) {
-      this.pcPontos += 1;
-    } else {
-      if (this.trucoService.carta1Vence) {
-        this.meusPontos += 1
-      }
-    }
-
-    this.zeraRodada();
-  }
-  */
-
-  //----------------------------------------------
-  selecionaPC(posicao: number) {
-    let cartaSelecionada = this.cartasComputador[posicao];
-    this.cartasComputador = this.cartasComputador.filter((carta) => carta.idCarta != cartaSelecionada.idCarta);
-
-    this.configuraJogada(cartaSelecionada);
-  }
-
-  continua(){
     let aleatorio = Math.floor(Math.random() * this.cartasComputador.length);
-    this.selecionaCarta(aleatorio,false);
+    this.selecionaCarta(aleatorio, false);
   }
 
   selecionaCarta(posicao: number, euJogando: boolean) {
 
-    if((euJogando && this.trucoService.minhaVez) || (!euJogando && !this.trucoService.minhaVez) ) {
+    if ((euJogando && this.trucoService.minhaVez) || (!euJogando && !this.trucoService.minhaVez)) {
       this.trucoService.selecionaCarta(posicao);
       this.carta1 = this.trucoService.minhaCarta;
       this.carta2 = this.trucoService.cartaAdversario;
@@ -89,36 +63,51 @@ export class TrucoComponent implements OnInit {
 
       this.minhasCartas = this.trucoService.minhasCartas;
       this.cartasComputador = this.trucoService.cartasComputador;
+      this.cartaVira = this.trucoService.cartaVira;
+      this.urlImagem = this.trucoService.cartaVira.urlFoto;
 
       this.meusPontos = this.trucoService.meusPontos;
       this.pcPontos = this.trucoService.pontosComputador;
       this.tentosValendo = this.trucoService.tentosValendo;
+      this.trataVencedoresRodada();
+
     } else {
       alert("Não é sua vez!");
     }
   }
 
   //----------------------------------------------
-  configuraJogada(carta: Carta) {
-    if (!this.carta1) {
-      this.carta1 = carta;
-      this.carta1Img = carta.urlFoto;
-    } else {
-
-      if (!this.carta2) {
-        this.carta2 = carta;
-        this.carta2Img = carta.urlFoto;
+  trataVencedoresRodada(): void {
+    this.rodadasJogo = this.trucoService.rodadasTruco;
+    if (this.rodadasJogo[0]) {
+      if (this.rodadasJogo[0].empate) {
+        this.primeiraRodada = 'EMPATE';
+      } else {
+        this.primeiraRodada = (this.rodadasJogo[0].primeiraVence) ? 'USUARIO' : 'PC';
       }
+    } else {
+      this.primeiraRodada = '';
     }
 
-    //this.trucoService.verificaGanhador(this.carta1, this.carta2);
-  }
+    if (this.rodadasJogo[1]) {
+      if (this.rodadasJogo[1].empate) {
+        this.segundaRodada = 'EMPATE';
+      } else {
+        this.segundaRodada = (this.rodadasJogo[1].primeiraVence) ? 'USUARIO' : 'PC';
+      }
+    } else {
+      this.segundaRodada = '';
+    }
 
-  zeraRodada() {
-    this.carta1 = null;
-    this.carta2 = null;
-    this.carta1Img = '';
-    this.carta2Img = '';
+    if (this.rodadasJogo[2]) {
+      if (this.rodadasJogo[2].empate) {
+        this.terceiraRodada = 'EMPATE';
+      } else {
+        this.terceiraRodada = (this.rodadasJogo[2].primeiraVence) ? 'USUARIO' : 'PC';
+      }
+    } else {
+      this.terceiraRodada = '';
+    }
   }
 
 }

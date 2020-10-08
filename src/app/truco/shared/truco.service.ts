@@ -39,7 +39,7 @@ export class TrucoService {
 
   iniciaJogo(limpo: boolean): void {
 
-    console.log("INICIA JOGO");
+    console.log("INICIA RODADA");
 
     this.cartas = [];
     this.minhasCartas = [];
@@ -101,6 +101,7 @@ export class TrucoService {
     this.cartaVira = this.geraCartaAleatoria();
     this.marcaComoUsada(this.cartaVira.idCarta);
     this.marcaComoManilha();
+    console.log(`Vira é a carta ${this.cartaVira.carta} de ${this.cartaVira.nipe}`);
   }
 
   //----------------------------------------------
@@ -188,7 +189,13 @@ export class TrucoService {
       this.cartaAdversario.desviraCarta();
     }
 
-    console.log("Carta Jogada", cartaSelecionada);
+    //console.log("Carta Jogada", cartaSelecionada);
+    if (this.minhaVez) {
+      console.log(`MINHA Carta Jogada ${cartaSelecionada.carta} de ${cartaSelecionada.nipe}`);
+    } else {
+      console.log(`PC Carta Jogada ${cartaSelecionada.carta} de ${cartaSelecionada.nipe}`);
+
+    }
 
     if (this.minhaCarta && this.cartaAdversario) {
       this.rodada++;
@@ -204,8 +211,6 @@ export class TrucoService {
       } else {
         console.log("Sem vencedor");
       }
-
-      console.log("Rodadas", this.rodadasTruco);
       this.validaAsRodadas();
 
     } else {
@@ -260,8 +265,8 @@ export class TrucoService {
       }
 
       if (minhaVitoria || minhaDerrota) {
+        console.log("FINAL DA RODADA");
         this.somaPontos(minhaVitoria);
-        this.rodadasTruco = [];
         this.mudaAVez();
       }
     }
@@ -274,7 +279,7 @@ export class TrucoService {
       this.pontosComputador += this.tentosValendo
     }
     this.tentosValendo = 1;
-    this.limpaARodada();
+    this.iniciaJogo(true);
   }
 
 }

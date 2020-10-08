@@ -7,25 +7,26 @@
             <button (click)="iniciaJogo(false)">Inicio Sujo</button>
         </div>
 
-        <!--
         <div class="col-sm">
-            <button (click)="continua()">Ok</button>
-        </div>
-        -->
-
-        <div class="col-sm placar">
-            <h1>Valendo: {{ tentosValendo }}</h1>
-            <h4>Meus Tentos: {{ meusPontos }} </h4>
-            <h4>PC Tentos: {{ pcPontos }} </h4>
-            <button (click)="continua()">Ok</button>
+            <div class="placar">
+                <h1>Valendo: {{ tentosValendo }}</h1>
+                <h4>Meus Tentos: {{ meusPontos }} </h4>
+                <h4>PC Tentos: {{ pcPontos }} </h4>
+                <button (click)="continua()">Ok</button>
+            </div>
+            <br>
+            <div class="rodada">
+                <h4>Primeira Rodada: {{ primeiraRodada }}</h4>
+                <h4>Segunda Rodada: {{ segundaRodada }}</h4>
+                <h4>Terceira Rodada: {{ terceiraRodada }}</h4>
+            </div>
         </div>
     </div>
 
-    <br>
-
     <div class="row carta">
         <div *ngFor="let carta of cartasComputador; let item=index" class="col-sm">
-            <div [style.backgroundImage]="'url('+ carta.urlFoto +')'" class="carta" (click)="selecionaCarta(item,false)">
+            <div [style.backgroundImage]="'url('+ carta.urlFoto +')'" class="carta"
+                (click)="selecionaCarta(item,false)">
                 <br><br><br><br><br><br>
             </div>
         </div>
