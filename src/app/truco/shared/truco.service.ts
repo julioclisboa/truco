@@ -231,7 +231,7 @@ export class TrucoService {
 
     if (this.minhaCarta && this.cartaAdversario) {
       this.rodada++;
-      rodada = new Rodada(this.rodada, this.minhaCarta, this.cartaAdversario);
+      rodada = new Rodada(this.minhaCarta, this.cartaAdversario);
       this.rodadasTruco.push(rodada);
 
       if (rodada.verificaVencedor()) {

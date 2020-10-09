@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { NgForm } from '@angular/forms';
 
-import { Carta, TrucoService, Rodada } from '../shared';
+import { Carta, TrucoService, Rodada, JogoTrucoService } from '../shared';
 
 @Component({
   selector: 'app-truco',
@@ -12,148 +12,111 @@ import { Carta, TrucoService, Rodada } from '../shared';
 export class TrucoComponent implements OnInit {
 
   readonly urlCartaVirada: string = `/assets/cartas/VIRADA.png`;
-  urlImagem: string;
-  cartaVira: Carta;
-  minhasCartas: Carta[] = [];
+
+  tentosValendo: number = 0;
+  tentosJogador: number = 0;
+  tentosComputador: number = 0;
+
+  vencedor1Rodada: string = '';
+  vencedor2Rodada: string = '';
+  vencedor3Rodada: string = '';
+
+  cartasJogador: Carta[];
   cartasComputador: Carta[];
 
-  carta1Img: string = '';
-  carta2Img: string = '';
-  carta1: Carta;
-  carta2: Carta;
-
-  meusPontos: number = 0;
-  pcPontos: number = 0;
-  tentosValendo: number = 1;
-
-  primeiraRodada: string = '';
-  segundaRodada: string = '';
-  terceiraRodada: string = '';
-  rodadasJogo: Rodada[];
+  cartaRodadaJogador: string = '';
+  cartaRodadaComputador: string = '';
+  cartaVira: string = '';
 
   constructor(
-    private trucoService: TrucoService
+    private trucoService: JogoTrucoService
   ) { }
 
   ngOnInit(): void {
   }
 
   iniciaJogo(limpo: boolean) {
-    this.trucoService.iniciaJogo(limpo);
-    this.cartaVira = this.trucoService.cartaVira;
-    this.urlImagem = `/assets/cartas/${this.cartaVira.imagem}.png`;
-    this.minhasCartas = this.trucoService.minhasCartas;
-    this.cartasComputador = this.trucoService.cartasComputador;
+    this.trucoService.iniciaJogo(limpo, true);
+    this.atribuiVariaveis();
   }
 
-  limpaARodada(): void {
-    this.trucoService.limpaARodada();
-    if (this.trucoService.finalDaRodada) {
-      this.trucoService.iniciaJogo(true);
-    }
-    this.ajustaMesa();
-    this.simulaPCJogando(false);
+  //-------------------------------------------------------------------------------------------
+  atribuiVariaveis(): void {
+    this.tentosValendo = this.trucoService.pontosRodada;
+    this.tentosJogador = this.trucoService.tentosUsuario;
+    this.tentosComputador = this.trucoService.tentosComputador;
+
+    this.cartasJogador = this.trucoService.aCartasJogador;
+    this.cartasComputador = this.trucoService.aCartasComputador;
+
+    this.vencedor1Rodada = this.retornaNomeVencedor(0);
+    this.vencedor2Rodada = this.retornaNomeVencedor(1);
+    this.vencedor3Rodada = this.retornaNomeVencedor(2);
+
+    this.cartaRodadaJogador = (this.trucoService.cartaJogador) ? this.trucoService.cartaJogador.urlFoto : '';
+    this.cartaRodadaComputador = (this.trucoService.cartaComputador) ? this.trucoService.cartaComputador.urlFoto : '';
+    this.cartaVira = this.trucoService.cartaVira.urlFoto;
   }
 
-  ajustaMesa(): void {
-    this.carta1 = this.trucoService.minhaCarta;
-    this.carta2 = this.trucoService.cartaAdversario;
-    this.carta1Img = (this.carta1) ? this.carta1.urlFoto : '';
-    this.carta2Img = (this.carta2) ? this.carta2.urlFoto : '';
-
-    this.minhasCartas = this.trucoService.minhasCartas;
-    this.cartasComputador = this.trucoService.cartasComputador;
-    this.cartaVira = this.trucoService.cartaVira;
-    this.urlImagem = this.trucoService.cartaVira.urlFoto;
-
-    this.meusPontos = this.trucoService.meusPontos;
-    this.pcPontos = this.trucoService.pontosComputador;
-    this.tentosValendo = this.trucoService.tentosValendo;
-    this.primeiraRodada = '';
-    this.segundaRodada = '';
-    this.trataVencedoresRodada();
-  }
-
-  selecionaCarta(posicao: number, euJogando: boolean) {
-    if ((euJogando && this.trucoService.minhaVez) || (!euJogando && !this.trucoService.minhaVez)) {
-      this.trucoService.selecionaCarta(posicao);
-      this.ajustaMesa();
-    } else {
-      alert("Não é sua vez!");
-    }
-
-    //SIMULA O PC JOGANDO ERRO TA AQUI
-    if (euJogando) {
-      this.simulaPCJogando(euJogando);
-      //setInterval(this.simulaPCJogando.bind(this), 1000);
-    }
-  }
-
-  simulaPCJogando(euJogando): void {
-    if (euJogando) {
-      //console.log('.............................................eu jogando');
-    } else {
-      //console.log('.............................................clique do botao');
-    }
-
-    //console.log('.............................................Final Rodada',this.trucoService.finalDaRodada);
-    if (!this.trucoService.finalDaRodada) {
-      if (!this.trucoService.minhaVez) {
-
-        console.log('');
-        console.log("SIMULA O PC JOGANDO");
-        console.log("Minha: ", this.trucoService.minhaCarta);
-        console.log("DELE: ", this.trucoService.cartaAdversario);
-        console.log('SERVICO',this.trucoService);
-        console.log('');
-
-        let idCartaPC = Math.floor(Math.random() * this.cartasComputador.length);
-        this.selecionaCarta(idCartaPC, false);
-      }
-    }
-
-    //console.log('.............................................Final Rodada',this.trucoService.finalDaRodada);
-    //console.log('.............................................Minha Vez',this.trucoService.minhaVez);
-  }
-
-  pedeTruco(): void {
-    if (this.trucoService.minhaVez) {
-
-    }
-  }
-
-  //----------------------------------------------
-  trataVencedoresRodada(): void {
-    this.rodadasJogo = this.trucoService.rodadasTruco;
-    if (this.rodadasJogo[0]) {
-      if (this.rodadasJogo[0].empate) {
-        this.primeiraRodada = 'EMPATE';
+  //-------------------------------------------------------------------------------------------
+  retornaNomeVencedor(rodada: number): string {
+    let vencedorNome: string = '';
+    if (this.trucoService.rodadas && this.trucoService.rodadas[rodada]) {
+      if (this.trucoService.rodadas[rodada].empate) {
+        vencedorNome = 'EMPATE';
       } else {
-        this.primeiraRodada = (this.rodadasJogo[0].primeiraVence) ? 'USUARIO' : 'PC';
+        vencedorNome = this.trucoService.rodadas[rodada].primeiraVence ? 'USUARIO' : 'PC';
       }
+    }
+    return vencedorNome;
+  }
+
+  //-------------------------------------------------------------------------------------------
+  selecionaCarta(posicaoCarta: number, foiJogador: boolean): void {
+    let carta = null;
+
+    if (foiJogador == !this.trucoService.vezJogador) {
+      alert("NÃO É SUA VEZ!");
     } else {
-      this.primeiraRodada = '';
+      if (foiJogador) {
+        carta = this.cartasJogador[posicaoCarta];
+      } else {
+        carta = this.cartasComputador[posicaoCarta];
+      }
+
+      this.trucoService.selecionaCarta(carta, foiJogador);
+      this.atribuiVariaveis();
     }
 
-    if (this.rodadasJogo[1]) {
-      if (this.rodadasJogo[1].empate) {
-        this.segundaRodada = 'EMPATE';
-      } else {
-        this.segundaRodada = (this.rodadasJogo[1].primeiraVence) ? 'USUARIO' : 'PC';
-      }
-    } else {
-      this.segundaRodada = '';
-    }
+    this.simulaVezPc();
+  }
 
-    if (this.rodadasJogo[2]) {
-      if (this.rodadasJogo[2].empate) {
-        this.terceiraRodada = 'EMPATE';
-      } else {
-        this.terceiraRodada = (this.rodadasJogo[2].primeiraVence) ? 'USUARIO' : 'PC';
-      }
-    } else {
-      this.terceiraRodada = '';
+  //-------------------------------------------------------------------------------------------
+  simulaVezPc() {
+    let segundos = 2 * 1000;
+
+    if (this.trucoService.vezComputador) {
+      setTimeout( () => {
+        console.log("------------- SIMULANDO A VEZ DO PC -------------");
+        let posicaoCarta = Math.floor(Math.random() * this.cartasComputador.length);
+        this.selecionaCarta(posicaoCarta, false);
+        this.trucoService.vezComputador = false;
+        this.trucoService.vezJogador = true;
+      }, segundos);
     }
   }
+
+  //-------------------------------------------------------------------------------------------
+  execJogada(): void {
+    this.trucoService.validaRodadas();
+    if (this.trucoService.acabouARodada) {
+      this.trucoService.finalizaRodada();
+      this.trucoService.iniciaRodada();
+    } else {
+      this.trucoService.limpaCartas();
+    }
+    this.atribuiVariaveis();
+  }
+
 
 }

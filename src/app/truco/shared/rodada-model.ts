@@ -6,16 +6,13 @@ export class Rodada {
     segundaVence: boolean;
     empate: boolean;
 
-    private _numRodada: number;
     private _primeiraCarta: Carta;
     private _segundaCarta: Carta;
 
     constructor(
-        numRodada: number,
         primeiraCarta: Carta,
         segundaCarta: Carta
     ) {
-        this._numRodada = numRodada;
         this._primeiraCarta = primeiraCarta;
         this._segundaCarta = segundaCarta;
     }

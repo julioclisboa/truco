@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TrucoRoutingModule } from './truco-routing.module';
 import { TrucoComponent } from './truco/truco.component';
 
-import { TrucoService } from './shared';
+import { JogoTrucoService, TrucoService } from './shared';
 
 @NgModule({
   declarations: [TrucoComponent],
@@ -18,7 +18,7 @@ import { TrucoService } from './shared';
     TrucoComponent
   ],
   providers: [
-    TrucoService
+    TrucoService,JogoTrucoService
   ]
 })
 export class TrucoModule { }
