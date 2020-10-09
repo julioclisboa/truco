@@ -11,11 +11,11 @@ import { Carta, TrucoService, Rodada } from '../shared';
 })
 export class TrucoComponent implements OnInit {
 
-  urlCartaVirada: string;
+  readonly urlCartaVirada: string = `/assets/cartas/VIRADA.png`;
   urlImagem: string;
   cartaVira: Carta;
   minhasCartas: Carta[] = [];
-  cartasComputador: Carta[] = [];
+  cartasComputador: Carta[];
 
   carta1Img: string = '';
   carta2Img: string = '';
@@ -42,16 +42,17 @@ export class TrucoComponent implements OnInit {
     this.trucoService.iniciaJogo(limpo);
     this.cartaVira = this.trucoService.cartaVira;
     this.urlImagem = `/assets/cartas/${this.cartaVira.imagem}.png`;
-    this.urlCartaVirada = `/assets/cartas/VIRADA.png`;
     this.minhasCartas = this.trucoService.minhasCartas;
     this.cartasComputador = this.trucoService.cartasComputador;
   }
 
   limpaARodada(): void {
     this.trucoService.limpaARodada();
+    if (this.trucoService.finalDaRodada) {
+      this.trucoService.iniciaJogo(true);
+    }
     this.ajustaMesa();
-
-    this.simulaPCJogando();
+    this.simulaPCJogando(false);
   }
 
   ajustaMesa(): void {
@@ -68,6 +69,8 @@ export class TrucoComponent implements OnInit {
     this.meusPontos = this.trucoService.meusPontos;
     this.pcPontos = this.trucoService.pontosComputador;
     this.tentosValendo = this.trucoService.tentosValendo;
+    this.primeiraRodada = '';
+    this.segundaRodada = '';
     this.trataVencedoresRodada();
   }
 
@@ -79,18 +82,43 @@ export class TrucoComponent implements OnInit {
       alert("Não é sua vez!");
     }
 
-    //SIMULA O PC JOGANDO
+    //SIMULA O PC JOGANDO ERRO TA AQUI
     if (euJogando) {
-      this.simulaPCJogando();
+      this.simulaPCJogando(euJogando);
       //setInterval(this.simulaPCJogando.bind(this), 1000);
     }
   }
 
-  simulaPCJogando(): void {
-    if (!this.trucoService.minhaVez) {
-      console.log("SIMULA O PC JOGANDO");
-      let idCartaPC = Math.floor(Math.random() * this.cartasComputador.length);
-      this.selecionaCarta(idCartaPC, false);
+  simulaPCJogando(euJogando): void {
+    if (euJogando) {
+      //console.log('.............................................eu jogando');
+    } else {
+      //console.log('.............................................clique do botao');
+    }
+
+    //console.log('.............................................Final Rodada',this.trucoService.finalDaRodada);
+    if (!this.trucoService.finalDaRodada) {
+      if (!this.trucoService.minhaVez) {
+
+        console.log('');
+        console.log("SIMULA O PC JOGANDO");
+        console.log("Minha: ", this.trucoService.minhaCarta);
+        console.log("DELE: ", this.trucoService.cartaAdversario);
+        console.log('SERVICO',this.trucoService);
+        console.log('');
+
+        let idCartaPC = Math.floor(Math.random() * this.cartasComputador.length);
+        this.selecionaCarta(idCartaPC, false);
+      }
+    }
+
+    //console.log('.............................................Final Rodada',this.trucoService.finalDaRodada);
+    //console.log('.............................................Minha Vez',this.trucoService.minhaVez);
+  }
+
+  pedeTruco(): void {
+    if (this.trucoService.minhaVez) {
+
     }
   }
 

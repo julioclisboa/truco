@@ -2,8 +2,12 @@
     background-repeat: no-repeat;
 }
 
-.fundo-mesa{
+.fundo-mesa1{
     background-image: url("/assets/cartas/FUNDO.png");
+}
+
+.fundo-mesa{
+    background-color: lawngreen;
 }
 
 .placar{
@@ -12,6 +16,6 @@
 
 .rodada{
     background-color: green;
-    color: gold;
+    color: indigo;
     align-content: right;
 }

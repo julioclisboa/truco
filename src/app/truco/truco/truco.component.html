@@ -1,29 +1,46 @@
-<div class="container fundo-mesa">
+<!--<div class="container fundo-mesa">-->
+<div class="container-fluid fundo-mesa">
     <div class="row">
         <div class="col-sm">
-            <button (click)="iniciaJogo(true)">Inicio Limpo</button>
+            <button (click)="iniciaJogo(true)" type="button" class="btn btn-danger">Inicio Limpo</button>
         </div>
         <div class="col-sm">
-            <button (click)="iniciaJogo(false)">Inicio Sujo</button>
+            <button (click)="iniciaJogo(false)" type="button" class="btn btn-danger">Inicio Sujo</button>
+        </div>
+
+        <div class="col-sm">
+            <button (click)="limpaARodada()" type="button" class="btn btn-info">Limpa Rodada</button><br>
+            <button (click)="pedeTruco()" type="button" class="btn btn-info">TRUCO!</button>
         </div>
 
         <div class="col-sm">
             <div class="placar">
-                <h1>Valendo: {{ tentosValendo }}</h1>
-                <h4>Meus Tentos: {{ meusPontos }} </h4>
-                <h4>PC Tentos: {{ pcPontos }} </h4>
-                <button (click)="limpaARodada()">Limpa Rodada</button>
+                <ul class="list-group">
+                    <li class="list-group-item list-group-item-info">Valendo: <b>{{ tentosValendo }}</b></li>
+                    <li class="list-group-item list-group-item-info">Meus Tentos: <b>{{ meusPontos }}</b></li>
+                    <li class="list-group-item list-group-item-info">PC Tentos: <b>{{ pcPontos }}</b></li>
+                </ul>
             </div>
-            <br>
+        </div>
+
+        <div class="col-sm">
             <div class="rodada">
-                <h4>Primeira Rodada: {{ primeiraRodada }}</h4>
-                <h4>Segunda Rodada: {{ segundaRodada }}</h4>
-                <h4>Terceira Rodada: {{ terceiraRodada }}</h4>
+                <ul class="list-group">
+                    <li class="list-group-item list-group-item-danger">Primeira Rodada: <b>{{ primeiraRodada }}</b></li>
+                    <li class="list-group-item list-group-item-danger">Segunda Rodada: <b>{{ segundaRodada }}</b></li>
+                    <li class="list-group-item list-group-item-danger">Terceira Rodada: <b>{{ terceiraRodada }}</b></li>
+                </ul>
             </div>
         </div>
     </div>
 
-    <div class="row carta">
+    <!-- CARTAS DO COMPUTADOR -->
+    <div class="row carta" id="cartas-pc">
+        <div *ngIf="!cartasComputador" id="cartasmeio" class="col-sm-1 carta">
+            <div class="carta" [style.backgroundImage]="'url(' + urlCartaVirada + ')'">
+                <br><br><br><br><br><br>
+            </div>
+        </div>
         <div *ngFor="let carta of cartasComputador; let item=index" class="col-sm">
             <div [style.backgroundImage]="'url('+ carta.urlFoto +')'" class="carta"
                 (click)="selecionaCarta(item,false)">
@@ -31,26 +48,26 @@
             </div>
         </div>
     </div>
+    <br>
 
-    <br><br>
-
-    <div *ngIf="urlImagem" class="row">
+    <!-- CARTAS DO MEIO, A VIRA E AS DO JOGO -->
+    <div class="row" id="cartas-jogo">
         <div class="col-sm carta" [style.backgroundImage]="'url('+ urlImagem +')'">
             <br><br><br><br><br><br>
         </div>
 
-        <div *ngIf="carta1Img" class="col-sm carta" [style.backgroundImage]="'url('+ carta1Img +')'">
+        <div class="col-sm carta" [style.backgroundImage]="'url('+ carta1Img +')'">
             <br><br><br><br><br><br>
         </div>
 
-        <div *ngIf="carta2Img" class="col-sm carta" [style.backgroundImage]="'url('+ carta2Img +')'">
+        <div class="col-sm carta" [style.backgroundImage]="'url('+ carta2Img +')'">
             <br><br><br><br><br><br>
         </div>
     </div>
+    <br>
 
-    <br><br>
-
-    <div class="row carta">
+    <!-- CARTAS DO USUARIO -->
+    <div class="row carta" id="cartas-usuario">
         <div *ngFor="let carta of minhasCartas; let item=index" class="col-sm">
             <div [style.backgroundImage]="'url('+ carta.urlFoto +')'" class="carta" (click)="selecionaCarta(item,true)">
                 <br><br><br><br><br><br>
