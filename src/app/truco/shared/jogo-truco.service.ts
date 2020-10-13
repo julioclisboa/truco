@@ -48,6 +48,9 @@ export class JogoTrucoService {
     this.jogadorComecou = jogadorComecou;
     this.vezJogador = jogadorComecou;
     this.vezComputador = !this.vezJogador;
+    this.pontosRodada = 1;
+    this.tentosComputador = 0;
+    this.tentosUsuario = 0;
 
     this.montaCartas(this.baralhoLimpo);
     this.iniciaRodada();
@@ -56,6 +59,7 @@ export class JogoTrucoService {
   //-------------------------------------------------------------------------------------------
   iniciaRodada(): void {
     console.log(">>> INICIO DA RODADA");
+    this.montaCartas(this.baralhoLimpo);
     this.geraCartasJogador();
     this.geraCartasComputador();
     this.sorteiaManilha();
@@ -240,7 +244,6 @@ export class JogoTrucoService {
 
     let qtdVitoriasJogador: number = this.rodadas.filter((rodada) => rodada.primeiraVence).length;
     let qtdVitoriasComputador: number = this.rodadas.filter((rodada) => rodada.segundaVence).length;
-    let qtdEmpates: number = this.rodadas.filter((rodada) => rodada.empate).length;
     let numRodadaAtual: number = this.rodadas.length;
 
     switch (numRodadaAtual) {
@@ -255,6 +258,7 @@ export class JogoTrucoService {
           this.computadorGanhouRodada = false;
           this.acabouARodada = false;
           console.log("Empate! Tera proxima rodada");
+          this.mudaAVez();
         } else {
           this.jogadorGanhouRodada = this.rodadaAtual.primeiraVence;
           this.computadorGanhouRodada = !this.jogadorGanhouRodada;
@@ -370,6 +374,7 @@ export class JogoTrucoService {
   mudaAVez(): void {
     this.vezJogador = !this.vezJogador;
     this.vezComputador = !this.vezComputador;
+    //(this.vezComputador) ? console.log("VEZ DO PC") : console.log("VEZ DO JOGADOR");
   }
 
   //-------------------------------------------------------------------------------------------

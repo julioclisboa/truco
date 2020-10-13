@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { NgForm } from '@angular/forms';
-
-import { Carta, TrucoService, Rodada, JogoTrucoService } from '../shared';
+import { Carta, JogoTrucoService } from '../shared';
 
 @Component({
   selector: 'app-truco',
@@ -27,6 +25,7 @@ export class TrucoComponent implements OnInit {
   cartaRodadaJogador: string = '';
   cartaRodadaComputador: string = '';
   cartaVira: string = '';
+  jogoIniciado: boolean = false;
 
   constructor(
     private trucoService: JogoTrucoService
@@ -36,7 +35,15 @@ export class TrucoComponent implements OnInit {
   }
 
   iniciaJogo(limpo: boolean) {
-    this.trucoService.iniciaJogo(limpo, true);
+    if (!this.jogoIniciado) {
+      this.trucoService.iniciaJogo(limpo, true);
+      this.jogoIniciado = true;
+    } else {
+      if (confirm('Deseja iniciar um novo jogo ?')) {
+        this.trucoService.iniciaJogo(limpo, true);
+        this.jogoIniciado = true;
+      }
+    }
     this.atribuiVariaveis();
   }
 
@@ -72,11 +79,13 @@ export class TrucoComponent implements OnInit {
   }
 
   //-------------------------------------------------------------------------------------------
-  selecionaCarta(posicaoCarta: number, foiJogador: boolean): void {
+  selecionaCarta(posicaoCarta: number, foiJogador: boolean, simulacao?: boolean): void {
     let carta = null;
 
     if (foiJogador == !this.trucoService.vezJogador) {
-      alert("NÃO É SUA VEZ!");
+      if (!simulacao) {
+        alert("NÃO É SUA VEZ!");
+      }
     } else {
       if (foiJogador) {
         carta = this.cartasJogador[posicaoCarta];
@@ -88,21 +97,8 @@ export class TrucoComponent implements OnInit {
       this.atribuiVariaveis();
     }
 
-    this.simulaVezPc();
-  }
-
-  //-------------------------------------------------------------------------------------------
-  simulaVezPc() {
-    let segundos = 2 * 1000;
-
-    if (this.trucoService.vezComputador) {
-      setTimeout( () => {
-        console.log("------------- SIMULANDO A VEZ DO PC -------------");
-        let posicaoCarta = Math.floor(Math.random() * this.cartasComputador.length);
-        this.selecionaCarta(posicaoCarta, false);
-        this.trucoService.vezComputador = false;
-        this.trucoService.vezJogador = true;
-      }, segundos);
+    if (this.trucoService.vezComputador && !simulacao) {
+      this.simulaVezPc();
     }
   }
 
@@ -115,7 +111,62 @@ export class TrucoComponent implements OnInit {
     } else {
       this.trucoService.limpaCartas();
     }
+    this.simulaVezPc();
     this.atribuiVariaveis();
+  }
+
+
+  //-------------------------------------------------------------------------------------------
+  simulaVezPc() {
+    let segundos = 1 * 1000;
+
+    if (this.trucoService.vezComputador) {
+      setTimeout(() => {
+        console.log("------------- SIMULANDO A VEZ DO PC -------------");
+
+        /*
+        let posicaoCarta = Math.floor(Math.random() * this.cartasComputador.length);
+        this.selecionaCarta(posicaoCarta, false, true);
+        */
+       this.selecionaCarta( this.verificaCarta(), false, true );
+
+        this.trucoService.vezComputador = false;
+        this.trucoService.vezJogador = true;
+      }, segundos);
+    }
+  }
+
+  verificaCarta(): number {
+
+    let posicaoCarta = 0;
+    let idCarta = 0;
+    let menorValor = 0;
+
+    if (this.trucoService.cartaJogador) {
+      this.trucoService.aCartasComputador.map((carta,posic) => {
+
+        //Se a carta vence a carta do jogador
+        if (carta.valor > this.trucoService.cartaJogador.valor) {
+
+          //se a carta é menor que a anterior
+          if (carta.valor < menorValor) {
+            posicaoCarta = posic;
+            idCarta = carta.valor;
+            menorValor = carta.valor;
+          }
+        }
+      })
+    } else {
+      this.trucoService.aCartasComputador.map((carta,posic) => {
+        if (carta.valor < menorValor) {
+          posicaoCarta = posic;
+          idCarta = carta.valor;
+          menorValor = carta.valor;
+        }
+      })
+    }
+
+    return posicaoCarta;
   }
 
 
