@@ -40,6 +40,7 @@ export class TrucoComponent implements OnInit {
       this.jogoIniciado = true;
     } else {
       if (confirm('Deseja iniciar um novo jogo ?')) {
+        this.trucoService.finalizaRodada();
         this.trucoService.iniciaJogo(limpo, true);
         this.jogoIniciado = true;
       }
@@ -114,7 +115,13 @@ export class TrucoComponent implements OnInit {
     this.simulaVezPc();
     this.atribuiVariaveis();
   }
-
+  
+  //-------------------------------------------------------------------------------------------
+  pedeTruco(euJogando: boolean): void{
+    if(euJogando && this.trucoService.vezJogador){
+      
+    }
+  }
 
   //-------------------------------------------------------------------------------------------
   simulaVezPc() {
@@ -136,11 +143,14 @@ export class TrucoComponent implements OnInit {
     }
   }
 
+  //-------------------------------------------------------------------------------------------
   verificaCarta(): number {
 
     let posicaoCarta = 0;
     let idCarta = 0;
     let menorValor = 0;
+
+    //console.log(this.trucoService.aCartasComputador);
 
     if (this.trucoService.cartaJogador) {
       this.trucoService.aCartasComputador.map((carta,posic) => {
@@ -149,7 +159,7 @@ export class TrucoComponent implements OnInit {
         if (carta.valor > this.trucoService.cartaJogador.valor) {
 
           //se a carta é menor que a anterior
-          if (carta.valor < menorValor) {
+          if (carta.valor < menorValor || menorValor == 0) {
             posicaoCarta = posic;
             idCarta = carta.valor;
             menorValor = carta.valor;
@@ -158,7 +168,7 @@ export class TrucoComponent implements OnInit {
       })
     } else {
       this.trucoService.aCartasComputador.map((carta,posic) => {
-        if (carta.valor < menorValor) {
+        if (carta.valor < menorValor || menorValor == 0) {
           posicaoCarta = posic;
           idCarta = carta.valor;
           menorValor = carta.valor;

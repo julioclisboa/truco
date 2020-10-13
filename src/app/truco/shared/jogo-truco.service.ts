@@ -63,6 +63,8 @@ export class JogoTrucoService {
     this.geraCartasJogador();
     this.geraCartasComputador();
     this.sorteiaManilha();
+
+    console.log(`> Virou: ${this.cartaVira.carta} de ${NipesBaralho[this.cartaVira.nipe]}`);
   }
 
   //-------------------------------------------------------------------------------------------
@@ -365,6 +367,10 @@ export class JogoTrucoService {
 
     if (this.acabouARodada) {
       this.somaPontos(this.jogadorGanhouRodada);
+      if(this.tentosComputador >= 12 || this.tentosUsuario >= 12){
+        this.finalizaRodada();
+        this.iniciaJogo(this.baralhoLimpo,!this.jogadorComecou);
+      }
     }
 
     console.log("");

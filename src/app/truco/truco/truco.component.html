@@ -1,5 +1,5 @@
 <!--<div class="container fundo-mesa">-->
-<div class="container-fluid">
+<div class="container-fluid fundo-mesa">
     <div class="row">
         <div class="col-sm">
             <button (click)="iniciaJogo(true)" type="button" class="btn btn-danger">Inicio Limpo</button>
@@ -10,7 +10,7 @@
 
         <div class="col-sm">
             <button (click)="execJogada()" type="button" class="btn btn-info">Executa Jogada</button><br>
-            <!--<button (click)="pedeTruco()" type="button" class="btn btn-info">TRUCO!</button>-->
+            <button (click)="pedeTruco(true)" type="button" class="btn btn-info">TRUCO!</button>
         </div>
 
         <div class="col-sm">
@@ -36,11 +36,6 @@
 
     <!-- CARTAS DO COMPUTADOR -->
     <div class="row carta" id="cartas-pc">
-        <div *ngIf="!cartasComputador" id="cartasmeio" class="col-sm-1 carta">
-            <div class="carta" [style.backgroundImage]="'url(' + urlCartaVirada + ')'">
-                <br><br><br><br><br><br>
-            </div>
-        </div>
         <div *ngFor="let carta of cartasComputador; let item=index" class="col-sm">
             <div [style.backgroundImage]="'url('+ carta.urlFoto +')'" class="carta"
                 (click)="selecionaCarta(item,false)">
